@@ -1,0 +1,87 @@
+---
+clusterName: moya
+talosVersion: v1.8.3
+kubernetesVersion: v1.31.3
+endpoint: https://192.168.174.210:6443
+domain: cluster.local
+allowSchedulingOnMasters: true
+allowSchedulingOnControlPlanes: true
+additionalMachineCertSans:
+  - 192.168.174.210
+additionalApiServerCertSans:
+  - 192.168.174.210
+  - moya.lemon.steicke.me
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
+cniConfig:
+  name: none
+extraManifests:
+- https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
+- https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+nodes:
+  - hostname: controller
+    ignoreHostname: true # expects hostname etc. to be set via DHCP
+    ipAddress: 192.168.174.211, 192.168.174.212, 192.168.174.213
+    controlPlane: true
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: true
+      secureboot: true
+    #installDisk: /dev/sdb
+    installDiskSelector:
+      type: ssd
+      #busPath: /pci0000:00/*/ata1/*
+      #size: ">= 200GB"
+    # NodeConfigs
+    disableSearchDomain: true
+    networkInterfaces:
+    nodeAnnotations:
+      model: hp-elitedesk-800-g2-mini
+      installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
+controlPlane:
+  patches:
+    - |-
+      - op: add
+        path: /machine/kubelet/extraArgs
+        value:
+          rotate-server-certificates: true
+  #         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+    # - "@./extraKernelArgs-patch.yaml"
+  nodeLabels:
+    isSecureBootEnabled: >-
+      {{
+        .MachineConfig.MachineInstall.InstallImage |
+        contains "installer-secureboot"
+      }}
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+  networkInterfaces:
+  - deviceSelector:
+      physical: true
+    dhcp: true
+    vip:
+      ip: 192.168.174.210
+    # vlans:
+    # - vlanId: 100
+    #   dhcp: true
+    #   vip:
+    #     ip: 192.168.175.210
+worker:
+  patches:
+    - |-
+      - op: add
+        path: /machine/kubelet/extraArgs
+        value:
+          rotate-server-certificates: true
+  #         feature-gates: GracefulNodeShutdown=false,MixedProtocolLBService=false
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
