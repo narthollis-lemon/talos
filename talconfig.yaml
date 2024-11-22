@@ -36,31 +36,45 @@ nodes:
       #busPath: /pci0000:00/*/ata1/*
       #size: ">= 200GB"
     # NodeConfigs
-    disableSearchDomain: true
-    networkInterfaces:
     nodeAnnotations:
       model: hp-elitedesk-800-g2-mini
       installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/intel-ucode
+
+  - hostname: rockpi-5b
+    ignoreHostname: true # expects hostname etc. to be set via DHCP
+    ipAddress: 192.168.174.215
+    controlPlane: false
+    talosImageURL: ghcr.io/milas/talos-rk3588:v1.7.4-rk3588.alpha.4-rock-5b
+    machineSpec:
+      mode: metal
+      arch: arm64
+    installDiskSelector:
+      type: sd
+    # NodeConfigs
+    # node annotations do not appear to be a thing in talos 1.7 used by the rockpi images
+    # nodeAnnotations:
+    #   model: rockpi-5b
+    #   installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
+
 controlPlane:
+  disableSearchDomain: true
   patches:
     - |-
       - op: add
         path: /machine/kubelet/extraArgs
         value:
           rotate-server-certificates: true
-  #         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
-    # - "@./extraKernelArgs-patch.yaml"
   nodeLabels:
     isSecureBootEnabled: >-
       {{
         .MachineConfig.MachineInstall.InstallImage |
         contains "installer-secureboot"
       }}
-  schematic:
-    customization:
-      systemExtensions:
-        officialExtensions:
-          - siderolabs/intel-ucode
   networkInterfaces:
   - deviceSelector:
       physical: true
@@ -73,15 +87,15 @@ controlPlane:
     #   vip:
     #     ip: 192.168.175.210
 worker:
+  disableSearchDomain: true
   patches:
     - |-
       - op: add
         path: /machine/kubelet/extraArgs
         value:
           rotate-server-certificates: true
-  #         feature-gates: GracefulNodeShutdown=false,MixedProtocolLBService=false
-  schematic:
-    customization:
-      systemExtensions:
-        officialExtensions:
-          - siderolabs/intel-ucode
+  # schematic:
+  #   customization:
+  #     systemExtensions:
+  #       officialExtensions:
+  #         - siderolabs/intel-ucode
