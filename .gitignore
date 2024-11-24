@@ -1,2 +1,4 @@
 clusterconfig/
 talsecret.sops.yaml
+talconfig.json
+
