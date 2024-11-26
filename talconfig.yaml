@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
 talosVersion: v1.8.3
@@ -17,7 +18,12 @@ clusterSvcNets:
   - 10.96.0.0/12
 cniConfig:
   name: none
-
+patches:
+  - |-
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: true
 nodes:
   - hostname: controller
     ignoreHostname: true # expects hostname etc. to be set via DHCP
@@ -47,6 +53,7 @@ nodes:
     ignoreHostname: true # expects hostname etc. to be set via DHCP
     ipAddress: 192.168.174.215
     controlPlane: false
+    # https://github.com/milas/talos-sbc-rk3588
     talosImageURL: ghcr.io/milas/talos-rk3588:v1.7.4-rk3588.alpha.4-rock-5b
     machineSpec:
       mode: metal
@@ -61,12 +68,6 @@ nodes:
 
 controlPlane:
   disableSearchDomain: true
-  patches:
-    - |-
-      - op: add
-        path: /machine/kubelet/extraArgs
-        value:
-          rotate-server-certificates: true
   nodeLabels:
     isSecureBootEnabled: >-
       {{
@@ -84,17 +85,36 @@ controlPlane:
       #   dhcp: true
       #   vip:
       #     ip: 192.168.175.210
-  extraManifests:
-    - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-    - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-worker:
-  disableSearchDomain: true
+  machineFiles:
+    - content: "@./apiserver/auth-configuration.yaml"
+      op: create
+      path: /var/apiServer/auth-configuration.yaml
+      permissions: 0o644
   patches:
     - |-
       - op: add
-        path: /machine/kubelet/extraArgs
+        path: /cluster/extraManifests
+        value: []
+      - op: add
+        path: /cluster/extraManifests/-
+        value: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
+      - op: add
+        path: /cluster/extraManifests/-
+        value: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    - |-
+      - op: add
+        path: /cluster/apiServer/extraVolumes
         value:
-          rotate-server-certificates: true
+          - hostPath: /var/apiServer/
+            mountPath: /etc/config
+            readonly: true
+      - op: add
+        path: /cluster/apiServer/extraArgs
+        value:
+          authentication-config: /etc/config/auth-configuration.yaml
+worker:
+  disableSearchDomain: true
+
   # schematic:
   #   customization:
   #     systemExtensions:
