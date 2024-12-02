@@ -66,6 +66,24 @@ nodes:
     #   model: rockpi-5b
     #   installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
 
+  - hostname: raspberrypi-4b
+    ignoreHostname: true # expects hostname etc. to be set via DHCP
+    ipAddress: 192.168.174.214
+    controlPlane: false
+    machineSpec:
+      mode: metal
+      arch: arm64
+    installDiskSelector:
+      type: sd
+    schematic:
+      overlay:
+        image: siderolabs/sbc-raspberrypi
+        name: rpi_generic
+    # NodeConfigs
+    nodeAnnotations:
+      model: raspberrypi-4b
+      installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
+
 controlPlane:
   disableSearchDomain: true
   nodeLabels:
