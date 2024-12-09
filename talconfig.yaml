@@ -22,6 +22,11 @@ cniConfig:
   name: none
 patches:
   - |-
+    - op: replace
+      path: /cluster/proxy
+      value:
+        disabled: true
+  - |-
     - op: add
       path: /machine/kubelet/extraArgs
       value:
