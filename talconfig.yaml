@@ -72,6 +72,12 @@ nodes:
     # nodeAnnotations:
     #   model: rockpi-5b
     #   installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
+    patches:
+      - |-
+        - op: add
+          path: /machine/sysfs
+          value:
+            devices.platform.pwm-fan.hwmon.hwmon7.pwm1: 128
 
   - hostname: raspberrypi-4b
     ignoreHostname: true # expects hostname etc. to be set via DHCP
