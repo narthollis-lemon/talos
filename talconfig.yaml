@@ -14,7 +14,7 @@ additionalApiServerCertSans:
   - moya.lemon.steicke.me
 clusterPodNets:
   - 10.244.0.0/16
-  - fc00::/56
+  - 2403:580d:885c:fe00::/56
 clusterSvcNets:
   - 10.96.0.0/12
   - fc00:0:0:100::/108
