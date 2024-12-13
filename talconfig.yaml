@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
-talosVersion: v1.8.3
-kubernetesVersion: v1.31.3
+talosVersion: v1.9.0-beta.1
+kubernetesVersion: v1.32.0
 endpoint: https://192.168.174.210:6443
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -31,6 +31,18 @@ patches:
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: true
+  - |-
+    - op: add
+      path: /machine/kubelet/extraConfig
+      value:
+        featureGates:
+          UserNamespacesSupport: true
+          UserNamespacesPodSecurityStandards: true
+  - |-
+    - op: add
+      path: /machine/sysctls
+      value:
+        user.max_user_namespaces: "11255"
 nodes:
   - hostname: controller
     ignoreHostname: true # expects hostname etc. to be set via DHCP
@@ -143,6 +155,7 @@ controlPlane:
         path: /cluster/apiServer/extraArgs
         value:
           authentication-config: /etc/config/auth-configuration.yaml
+          feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
 worker:
   disableSearchDomain: true
 
