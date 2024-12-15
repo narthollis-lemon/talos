@@ -3,15 +3,15 @@
 clusterName: moya
 talosVersion: v1.9.0-beta.1
 kubernetesVersion: v1.32.0
-endpoint: https://192.168.174.210:6443
+endpoint: https://moya.lemon.narthollis.net:6443
 domain: cluster.local
 allowSchedulingOnMasters: true
 allowSchedulingOnControlPlanes: true
 additionalMachineCertSans:
   - 192.168.174.210
 additionalApiServerCertSans:
+  - moya.lemon.narthollis.net
   - 192.168.174.210
-  - moya.lemon.steicke.me
 clusterPodNets:
   - 10.244.0.0/16
   - 2403:580d:885c:fe00::/56
