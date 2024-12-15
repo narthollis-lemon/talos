@@ -43,6 +43,11 @@ patches:
       path: /machine/sysctls
       value:
         user.max_user_namespaces: "11255"
+  - |-
+    - op: replace
+      path: /machine/features/hostDNS
+      value:
+        enabled: false
 nodes:
   - hostname: controller
     ignoreHostname: true # expects hostname etc. to be set via DHCP
