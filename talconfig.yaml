@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
-talosVersion: v1.9.0-beta.1
+talosVersion: v1.9.0
 kubernetesVersion: v1.32.0
-endpoint: https://moya.lemon.narthollis.net:6443
+endpoint: https://moya.lemon.narthollis.net/
 domain: cluster.local
 allowSchedulingOnMasters: true
 allowSchedulingOnControlPlanes: true
@@ -48,6 +48,19 @@ patches:
       path: /machine/features/hostDNS
       value:
         enabled: false
+  - |-
+    - op: add
+      path: /machine/network/extraHostEntries
+      value:
+      - ip: 192.168.174.211
+        aliases:
+        - moya.lemon.narthollis.net
+      - ip: 192.168.174.212
+        aliases:
+        - moya.lemon.narthollis.net
+      - ip: 192.168.174.213
+        aliases:
+        - moya.lemon.narthollis.net
 nodes:
   - hostname: controller
     ignoreHostname: true # expects hostname etc. to be set via DHCP
@@ -149,6 +162,10 @@ controlPlane:
       - op: add
         path: /cluster/extraManifests/-
         value: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    - |- 
+      - op: add
+        path: /cluster/controlPlane/localAPIServerPort
+        value: 443
     - |-
       - op: add
         path: /cluster/apiServer/extraVolumes
