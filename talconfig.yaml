@@ -11,6 +11,7 @@ additionalMachineCertSans:
   - 192.168.174.210
 additionalApiServerCertSans:
   - moya.lemon.narthollis.net
+  - oidc.moya.lemon.narthollis.net
   - 192.168.174.210
 clusterPodNets:
   - 10.244.0.0/16
@@ -55,12 +56,15 @@ patches:
       - ip: 192.168.174.211
         aliases:
         - moya.lemon.narthollis.net
+        - oidc.moya.lemon.narthollis.net
       - ip: 192.168.174.212
         aliases:
         - moya.lemon.narthollis.net
+        - oidc.moya.lemon.narthollis.net
       - ip: 192.168.174.213
         aliases:
         - moya.lemon.narthollis.net
+        - oidc.moya.lemon.narthollis.net
 nodes:
   - hostname: controller
     ignoreHostname: true # expects hostname etc. to be set via DHCP
@@ -178,6 +182,8 @@ controlPlane:
         value:
           authentication-config: /etc/config/auth-configuration.yaml
           feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
+          service-account-issuer: https://oidc.moya.lemon.narthollis.net/
+          service-account-jwks-uri: https://oidc.moya.lemon.narthollis.net/openid/v1/jwks
 worker:
   disableSearchDomain: true
 
