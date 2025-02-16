@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
-talosVersion: v1.9.0
-kubernetesVersion: v1.32.0
+talosVersion: v1.9.3
+kubernetesVersion: v1.32.2
 endpoint: https://moya.lemon.narthollis.net/
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -94,24 +94,16 @@ nodes:
     ignoreHostname: true # expects hostname etc. to be set via DHCP
     ipAddress: 192.168.174.215
     controlPlane: false
-    # https://github.com/milas/talos-sbc-rk3588
-    talosImageURL: ghcr.io/milas/talos-rk3588:v1.7.4-rk3588.alpha.4-rock-5b
     machineSpec:
       mode: metal
       arch: arm64
     installDiskSelector:
-      type: sd
+      type: ssd
     # NodeConfigs
     # node annotations do not appear to be a thing in talos 1.7 used by the rockpi images
-    # nodeAnnotations:
-    #   model: rockpi-5b
-    #   installerUrl: '{{ .MachineConfig.MachineInstall.InstallImage }}'
-    patches:
-      - |-
-        - op: add
-          path: /machine/sysfs
-          value:
-            devices.platform.pwm-fan.hwmon.hwmon7.pwm1: 128
+    nodeAnnotations:
+      model: rockpi-5b
+      installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
 
   - hostname: raspberrypi-4b
     ignoreHostname: true # expects hostname etc. to be set via DHCP
