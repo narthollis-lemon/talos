@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
-talosVersion: v1.9.3
+talosVersion: v1.9.4
 kubernetesVersion: v1.32.2
 endpoint: https://moya.lemon.narthollis.net/
 domain: cluster.local
@@ -75,12 +75,15 @@ nodes:
       arch: amd64
       useUKI: true
       secureboot: true
-    #installDisk: /dev/sdb
     installDiskSelector:
-      type: ssd
-      #busPath: /pci0000:00/*/ata1/*
-      #size: ">= 200GB"
+      type: nvme
+    # machineDisks: # storage disks are managed by Rook Ceph
+    #   - device: /dev/sda
+    #     partitions:
+    #       - mountpoint: /var/lib/rook
     # NodeConfigs
+    nodeLabels:
+      narthollis.net/rook-node: "true"
     nodeAnnotations:
       model: hp-elitedesk-800-g2-mini
       installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
@@ -97,8 +100,16 @@ nodes:
     machineSpec:
       mode: metal
       arch: arm64
+    schematic:
+      overlay:
+        image: siderolabs/sbc-rockchip
+        name: rock5b
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/realtek-firmware
     installDiskSelector:
-      type: ssd
+      type: sd
     # NodeConfigs
     # node annotations do not appear to be a thing in talos 1.7 used by the rockpi images
     nodeAnnotations:
