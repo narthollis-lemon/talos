@@ -158,6 +158,11 @@ controlPlane:
       op: create
       path: /var/apiServer/auth-configuration.yaml
       permissions: 0o644
+    - path: /etc/cri/conf.d/20-customization.part
+      op: create
+      content: |
+        [plugins."io.containerd.cri.v1.images"]
+          discard_unpacked_layers = false
   patches:
     - |-
       - op: add
@@ -189,7 +194,12 @@ controlPlane:
           service-account-jwks-uri: https://oidc.moya.lemon.narthollis.net/openid/v1/jwks
 worker:
   disableSearchDomain: true
-
+  machineFiles:
+    - path: /etc/cri/conf.d/20-customization.part
+      op: create
+      content: |
+        [plugins."io.containerd.cri.v1.images"]
+          discard_unpacked_layers = false
   # schematic:
   #   customization:
   #     systemExtensions:
