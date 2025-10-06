@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: moya
-talosVersion: v1.9.4
-kubernetesVersion: v1.32.2
+talosVersion: v1.11.2
+kubernetesVersion: v1.34.1
 endpoint: https://moya.lemon.narthollis.net/
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -146,6 +146,9 @@ controlPlane:
     - deviceSelector:
         physical: true
       dhcp: true
+      # dhcpOptions:
+      #   ipv4: true
+      #   ipv6: true # TODO Investigate again sometime in the future
       vip:
         ip: 192.168.174.210
       # vlans:
