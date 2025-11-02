@@ -8,131 +8,131 @@ domain: cluster.local
 allowSchedulingOnMasters: true
 allowSchedulingOnControlPlanes: true
 additionalMachineCertSans:
-  - 192.168.174.210
+- 192.168.174.210
 additionalApiServerCertSans:
-  - moya.lemon.narthollis.net
-  - oidc.moya.lemon.narthollis.net
-  - 192.168.174.210
+- moya.lemon.narthollis.net
+- oidc.moya.lemon.narthollis.net
+- 192.168.174.210
 clusterPodNets:
-  - 10.244.0.0/16
-  - 2403:580d:885c:fe00::/56
+- 10.244.0.0/16
+- 2403:580d:885c:fe00::/56
 clusterSvcNets:
-  - 10.96.0.0/12
-  - fc00:0:0:100::/108
+- 10.96.0.0/12
+- fc00:0:0:100::/108
 cniConfig:
   name: none
 patches:
-  - |-
-    - op: replace
-      path: /cluster/proxy
-      value:
-        disabled: true
-  - |-
-    - op: add
-      path: /machine/kubelet/extraArgs
-      value:
-        rotate-server-certificates: true
-  - |-
-    - op: add
-      path: /machine/kubelet/extraConfig
-      value:
-        featureGates:
-          UserNamespacesSupport: true
-          UserNamespacesPodSecurityStandards: true
-  - |-
-    - op: add
-      path: /machine/sysctls
-      value:
-        user.max_user_namespaces: "11255"
-  - |-
-    - op: replace
-      path: /machine/features/hostDNS
-      value:
-        enabled: false
-  - |-
-    - op: add
-      path: /machine/network/extraHostEntries
-      value:
-      - ip: 192.168.174.211
-        aliases:
-        - moya.lemon.narthollis.net
-        - oidc.moya.lemon.narthollis.net
-      - ip: 192.168.174.212
-        aliases:
-        - moya.lemon.narthollis.net
-        - oidc.moya.lemon.narthollis.net
-      - ip: 192.168.174.213
-        aliases:
-        - moya.lemon.narthollis.net
-        - oidc.moya.lemon.narthollis.net
+- |-
+  - op: replace
+    path: /cluster/proxy
+    value:
+      disabled: true
+- |-
+  - op: add
+    path: /machine/kubelet/extraArgs
+    value:
+      rotate-server-certificates: true
+- |-
+  - op: add
+    path: /machine/kubelet/extraConfig
+    value:
+      featureGates:
+        UserNamespacesSupport: true
+        UserNamespacesPodSecurityStandards: true
+- |-
+  - op: add
+    path: /machine/sysctls
+    value:
+      user.max_user_namespaces: "11255"
+- |-
+  - op: replace
+    path: /machine/features/hostDNS
+    value:
+      enabled: false
+- |-
+  - op: add
+    path: /machine/network/extraHostEntries
+    value:
+    - ip: 192.168.174.211
+      aliases:
+      - moya.lemon.narthollis.net
+      - oidc.moya.lemon.narthollis.net
+    - ip: 192.168.174.212
+      aliases:
+      - moya.lemon.narthollis.net
+      - oidc.moya.lemon.narthollis.net
+    - ip: 192.168.174.213
+      aliases:
+      - moya.lemon.narthollis.net
+      - oidc.moya.lemon.narthollis.net
 nodes:
-  - hostname: controller
-    ignoreHostname: true # expects hostname etc. to be set via DHCP
-    ipAddress: 192.168.174.211, 192.168.174.212, 192.168.174.213
-    controlPlane: true
-    machineSpec:
-      mode: metal
-      arch: amd64
-      useUKI: true
-      secureboot: true
-    installDiskSelector:
-      type: nvme
-    # machineDisks: # storage disks are managed by Rook Ceph
-    #   - device: /dev/sda
-    #     partitions:
-    #       - mountpoint: /var/lib/rook
-    # NodeConfigs
-    nodeLabels:
-      narthollis.net/rook-node: "true"
-    nodeAnnotations:
-      model: hp-elitedesk-800-g2-mini
-      installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
-    schematic:
-      customization:
-        systemExtensions:
-          officialExtensions:
-            - siderolabs/intel-ucode
+- hostname: controller
+  ignoreHostname: true # expects hostname etc. to be set via DHCP
+  ipAddress: 192.168.174.211, 192.168.174.212, 192.168.174.213
+  controlPlane: true
+  machineSpec:
+    mode: metal
+    arch: amd64
+    useUKI: true
+    secureboot: true
+  installDiskSelector:
+    type: nvme
+  # machineDisks: # storage disks are managed by Rook Ceph
+  #   - device: /dev/sda
+  #     partitions:
+  #       - mountpoint: /var/lib/rook
+  # NodeConfigs
+  nodeLabels:
+    narthollis.net/rook-node: "true"
+  nodeAnnotations:
+    model: hp-elitedesk-800-g2-mini
+    installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+        - siderolabs/intel-ucode
+        - siderolabs/i915
+- hostname: rockpi-5b
+  ignoreHostname: true # expects hostname etc. to be set via DHCP
+  ipAddress: 192.168.174.215
+  controlPlane: false
+  machineSpec:
+    mode: metal
+    arch: arm64
+  schematic:
+    overlay:
+      image: siderolabs/sbc-rockchip
+      name: rock5b
+    customization:
+      systemExtensions:
+        officialExtensions:
+        - siderolabs/realtek-firmware
+  installDiskSelector:
+    type: sd
+  # NodeConfigs
+  # node annotations do not appear to be a thing in talos 1.7 used by the rockpi images
+  nodeAnnotations:
+    model: rockpi-5b
+    installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
 
-  - hostname: rockpi-5b
-    ignoreHostname: true # expects hostname etc. to be set via DHCP
-    ipAddress: 192.168.174.215
-    controlPlane: false
-    machineSpec:
-      mode: metal
-      arch: arm64
-    schematic:
-      overlay:
-        image: siderolabs/sbc-rockchip
-        name: rock5b
-      customization:
-        systemExtensions:
-          officialExtensions:
-            - siderolabs/realtek-firmware
-    installDiskSelector:
-      type: sd
-    # NodeConfigs
-    # node annotations do not appear to be a thing in talos 1.7 used by the rockpi images
-    nodeAnnotations:
-      model: rockpi-5b
-      installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
-
-  - hostname: raspberrypi-4b
-    ignoreHostname: true # expects hostname etc. to be set via DHCP
-    ipAddress: 192.168.174.214
-    controlPlane: false
-    machineSpec:
-      mode: metal
-      arch: arm64
-    installDiskSelector:
-      type: sd
-    schematic:
-      overlay:
-        image: siderolabs/sbc-raspberrypi
-        name: rpi_generic
-    # NodeConfigs
-    nodeAnnotations:
-      model: raspberrypi-4b
-      installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
+- hostname: raspberrypi-4b
+  ignoreHostname: true # expects hostname etc. to be set via DHCP
+  ipAddress: 192.168.174.214
+  controlPlane: false
+  machineSpec:
+    mode: metal
+    arch: arm64
+  installDiskSelector:
+    type: sd
+  schematic:
+    overlay:
+      image: siderolabs/sbc-raspberrypi
+      name: rpi_generic
+  # NodeConfigs
+  nodeAnnotations:
+    model: raspberrypi-4b
+    installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
 
 controlPlane:
   disableSearchDomain: true
@@ -143,66 +143,66 @@ controlPlane:
         contains "installer-secureboot"
       }}
   networkInterfaces:
-    - deviceSelector:
-        physical: true
-      dhcp: true
-      # dhcpOptions:
-      #   ipv4: true
-      #   ipv6: true # TODO Investigate again sometime in the future
-      vip:
-        ip: 192.168.174.210
-      # vlans:
-      # - vlanId: 100
-      #   dhcp: true
-      #   vip:
-      #     ip: 192.168.175.210
+  - deviceSelector:
+      physical: true
+    dhcp: true
+    # dhcpOptions:
+    #   ipv4: true
+    #   ipv6: true # TODO Investigate again sometime in the future
+    vip:
+      ip: 192.168.174.210
+    # vlans:
+    # - vlanId: 100
+    #   dhcp: true
+    #   vip:
+    #     ip: 192.168.175.210
   machineFiles:
-    - content: "@./apiserver/auth-configuration.yaml"
-      op: create
-      path: /var/apiServer/auth-configuration.yaml
-      permissions: 0o644
-    - path: /etc/cri/conf.d/20-customization.part
-      op: create
-      content: |
-        [plugins."io.containerd.cri.v1.images"]
-          discard_unpacked_layers = false
+  - content: "@./apiserver/auth-configuration.yaml"
+    op: create
+    path: /var/apiServer/auth-configuration.yaml
+    permissions: 0o644
+  - path: /etc/cri/conf.d/20-customization.part
+    op: create
+    content: |
+      [plugins."io.containerd.cri.v1.images"]
+        discard_unpacked_layers = false
   patches:
-    - |-
-      - op: add
-        path: /cluster/extraManifests
-        value: []
-      - op: add
-        path: /cluster/extraManifests/-
-        value: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-      - op: add
-        path: /cluster/extraManifests/-
-        value: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    - |- 
-      - op: add
-        path: /cluster/controlPlane/localAPIServerPort
-        value: 443
-    - |-
-      - op: add
-        path: /cluster/apiServer/extraVolumes
-        value:
-          - hostPath: /var/apiServer/
-            mountPath: /etc/config
-            readonly: true
-      - op: add
-        path: /cluster/apiServer/extraArgs
-        value:
-          authentication-config: /etc/config/auth-configuration.yaml
-          feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
-          service-account-issuer: https://oidc.moya.lemon.narthollis.net/
-          service-account-jwks-uri: https://oidc.moya.lemon.narthollis.net/openid/v1/jwks
+  - |-
+    - op: add
+      path: /cluster/extraManifests
+      value: []
+    - op: add
+      path: /cluster/extraManifests/-
+      value: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
+    - op: add
+      path: /cluster/extraManifests/-
+      value: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+  - |-
+    - op: add
+      path: /cluster/controlPlane/localAPIServerPort
+      value: 443
+  - |-
+    - op: add
+      path: /cluster/apiServer/extraVolumes
+      value:
+        - hostPath: /var/apiServer/
+          mountPath: /etc/config
+          readonly: true
+    - op: add
+      path: /cluster/apiServer/extraArgs
+      value:
+        authentication-config: /etc/config/auth-configuration.yaml
+        feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
+        service-account-issuer: https://oidc.moya.lemon.narthollis.net/
+        service-account-jwks-uri: https://oidc.moya.lemon.narthollis.net/openid/v1/jwks
 worker:
   disableSearchDomain: true
   machineFiles:
-    - path: /etc/cri/conf.d/20-customization.part
-      op: create
-      content: |
-        [plugins."io.containerd.cri.v1.images"]
-          discard_unpacked_layers = false
+  - path: /etc/cri/conf.d/20-customization.part
+    op: create
+    content: |
+      [plugins."io.containerd.cri.v1.images"]
+        discard_unpacked_layers = false
   # schematic:
   #   customization:
   #     systemExtensions:
