@@ -93,6 +93,42 @@ nodes:
         officialExtensions:
         - siderolabs/intel-ucode
         - siderolabs/i915
+
+- hostname: controller-g4
+  ignoreHostname: true # Automatically adopts hostnames assigned by DHCP
+  # Provide the 3 new IPs assigned to your incoming G4 towers
+  ipAddress: 192.168.174.220, 192.168.174.222, 192.168.174.224
+  controlPlane: true
+  machineSpec:
+    mode: metal
+    arch: amd64
+    useUKI: true
+    secureboot: true
+  installDiskSelector:
+    type: ssd
+    wwid: "naa.*"
+    #bus: sata # Forces Talos to install onto the SATA SSD, ignoring NVMe and HDDs
+  nodeLabels:
+    narthollis.net/rook-node: "true"
+  nodeAnnotations:
+    model: hp-elitedesk-800-g4-mini-tower
+    installerUrl: "{{ .MachineConfig.MachineInstall.InstallImage }}"
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+        - siderolabs/intel-ucode
+        - siderolabs/i915 # Kept in case you use Intel QuickSync for Plex transcoding later
+  networkInterfaces:
+  - deviceSelector:
+      driver: e1000e # Binds external cluster traffic and the VIP to the internal Intel NIC
+    dhcp: true
+    vip:
+      ip: 192.168.174.210
+  - deviceSelector:
+      driver: igc # Binds dedicated Ceph storage traffic to your add-in I226-V NIC
+    dhcp: true
+
 - hostname: rockpi-5b
   ignoreHostname: true # expects hostname etc. to be set via DHCP
   ipAddress: 192.168.174.215
