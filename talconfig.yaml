@@ -53,15 +53,15 @@ patches:
   - op: add
     path: /machine/network/extraHostEntries
     value:
-    - ip: 192.168.174.211
+    - ip: 192.168.174.220
       aliases:
       - moya.lemon.narthollis.net
       - oidc.moya.lemon.narthollis.net
-    - ip: 192.168.174.212
+    - ip: 192.168.174.222
       aliases:
       - moya.lemon.narthollis.net
       - oidc.moya.lemon.narthollis.net
-    - ip: 192.168.174.213
+    - ip: 192.168.174.224
       aliases:
       - moya.lemon.narthollis.net
       - oidc.moya.lemon.narthollis.net
